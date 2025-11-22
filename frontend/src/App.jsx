@@ -3,7 +3,6 @@ import { useState } from "react";
 function App() {
   return (
     <div className="bg-gradient-to-b from-white to-[#F5F5F5] text-[#1B5E20]">
-      {/* HEADER */}
       <header className="bg-gradient-to-r from-[#1B5E20] to-[#2d7a32] text-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-6 py-5 flex items-center justify-between">
           <a
@@ -29,7 +28,6 @@ function App() {
         </div>
       </header>
 
-      {/* HERO */}
       <section
         className="relative h-[80vh] flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: "url('/images/hero.jpg')" }}
@@ -64,7 +62,6 @@ function App() {
         </div>
       </section>
 
-      {/* CATEGORII */}
       <section className="py-20 container mx-auto px-6">
         <h2 className="text-4xl font-black mb-10 text-center">
           Categorii <span className="text-[#00C896]">populare</span>
@@ -109,7 +106,6 @@ function App() {
         </div>
       </section>
 
-      {/* PRODUSE POPULARE */}
       <section className="py-20 bg-gradient-to-b from-white to-[#f0f0f0]">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-black mb-12">
@@ -155,7 +151,6 @@ function App() {
         </div>
       </section>
 
-      {/* DE CE NOI */}
       <section className="py-20 container mx-auto px-6">
         <h2 className="text-center text-4xl font-black mb-12">
           De ce <span className="text-[#00C896]">AO Semințe</span>?
@@ -191,7 +186,6 @@ function App() {
         </div>
       </section>
 
-      {/* SPONSORI */}
       <section className="py-16 bg-white">
         <h2 className="text-center text-4xl font-black mb-10">
           Parteneri <span className="text-[#00C896]">oficiali</span>
@@ -214,7 +208,6 @@ function App() {
         </div>
       </section>
 
-      {/* NOUTĂȚI */}
       <section className="py-20 container mx-auto px-6">
         <h2 className="text-center text-4xl font-black mb-12">
           Ultimele <span className="text-[#00C896]">noutăți</span>
@@ -241,7 +234,6 @@ function App() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
       <section className="py-24 bg-gradient-to-r from-[#1B5E20] to-[#2d7a32] text-white text-center">
         <h2 className="text-4xl font-black mb-6">Găsește produsele perfecte</h2>
         <p className="max-w-xl mx-auto mb-10 opacity-90">
@@ -255,7 +247,7 @@ function App() {
         </a>
       </section>
 
-      {/* FOOTER */}
+
       <footer className="bg-[#1B5E20] text-white py-14 text-sm">
         <div className="container mx-auto px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
@@ -303,7 +295,6 @@ function App() {
         </div>
       </footer>
 
-      {/* ANIMATIONS */}
       <style>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
