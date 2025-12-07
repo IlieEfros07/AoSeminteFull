@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 from models.config_public import ConfigPublic
-from schemas import ConfigPublicUpdate
+from schemas.config_public import ConfigPublicUpdate
+from fastapi import APIRouter
 
+router = APIRouter()
 def get_config(db: Session) -> ConfigPublic:
     return db.query(ConfigPublic).first()
 

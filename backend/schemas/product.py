@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from app.schemas.product_image import ProductImageOut
-from app.schemas.category import CategoryOut
+from schemas.product_image import ProductImageOut
+from schemas.category import CategoryOut
 
 class ProductBase(BaseModel):
     name: str

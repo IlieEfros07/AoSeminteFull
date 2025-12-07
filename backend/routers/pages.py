@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 from models.pages import Page
-from schemas import PageCreate, PageUpdate
+from schemas.pages import PageCreate, PageUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 def create_page(db: Session, data: PageCreate):
     page = Page(**data.dict())

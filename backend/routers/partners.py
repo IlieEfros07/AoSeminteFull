@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 from models.partner import Partner
-from schemas import PartnerCreate, PartnerUpdate
+from schemas.partner import PartnerCreate, PartnerUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 def create_partner(db: Session, data: PartnerCreate):
     partner = Partner(**data.dict())

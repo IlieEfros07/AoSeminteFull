@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from app.schemas.order_item import OrderItemOut
+from schemas.order_item import OrderItemOut
 
 class OrderBase(BaseModel):
     customer_name: str

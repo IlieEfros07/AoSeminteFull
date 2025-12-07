@@ -6,6 +6,9 @@ class PageBase(BaseModel):
     title: Optional[str] = None
     content: Optional[Dict[str, Any]] = None  # JSON
 
+class PageCreate(PageBase):
+    pass
+
 class PageUpdate(PageBase):
     pass
 

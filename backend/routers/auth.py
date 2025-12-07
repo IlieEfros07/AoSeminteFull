@@ -1,9 +1,13 @@
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from models.user import User
-from schemas import UserCreate, UserUpdate
+from schemas.user import UserCreate, UserUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password) 

@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 from models import category
-from schemas import CategoryCreate, CategoryUpdate
+from schemas.category import CategoryCreate, CategoryUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 def create_category(db: Session, category_data: CategoryCreate) -> category.Category:
     db_category = category.Category(**category_data.dict())

@@ -3,6 +3,9 @@ from models.order import Order
 from models.order_item import OrderItem
 from models.product import Product
 from schemas.order import OrderCreate, OrderUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 def get_orders(db: Session, skip: int = 0, limit: int = 100):
     return (

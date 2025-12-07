@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 from models.news import News
-from schemas import NewsCreate, NewsUpdate
+from schemas.news import NewsCreate, NewsUpdate
+from fastapi import APIRouter
+
+router = APIRouter()
 
 def create_news(db: Session, data: NewsCreate):
     item = News(**data.dict())
