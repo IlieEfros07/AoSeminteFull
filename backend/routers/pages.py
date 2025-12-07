@@ -1,40 +1,32 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models.pages import Page
 from schemas.pages import PageCreate, PageUpdate
-from fastapi import APIRouter
+from app.database import get_db
+import crud.pages as crud
 
 router = APIRouter()
 
-def create_page(db: Session, data: PageCreate):
-    page = Page(**data.dict())
-    db.add(page)
-    db.commit()
-    db.refresh(page)
+@router.post("/pages")
+def create(data: PageCreate, db: Session = Depends(get_db)):
+    return crud.create_page(db, data)
+
+@router.get("/pages")
+def all(db: Session = Depends(get_db)):
+    return crud.get_pages(db)
+
+@router.get("/pages/{slug}")
+def get(slug: str, db: Session = Depends(get_db)):
+    page = crud.get_page_by_slug(db, slug)
+    if not page:
+        raise HTTPException(404, "Page not found")
     return page
 
-def get_pages(db: Session):
-    return db.query(Page).all()
+@router.put("/pages/{id}")
+def update(id: int, data: PageUpdate, db: Session = Depends(get_db)):
+    return crud.update_page(db, id, data)
 
-def get_page(db: Session, page_id: int):
-    return db.query(Page).filter(Page.id == page_id).first()
-
-def update_page(db: Session, page_id: int, data: PageUpdate):
-    page = get_page(db, page_id)
-    if not page:
-        return None
-
-    for key, val in data.dict(exclude_unset=True).items():
-        setattr(page, key, val)
-
-    db.commit()
-    db.refresh(page)
-    return page
-
-def delete_page(db: Session, page_id: int):
-    page = get_page(db, page_id)
-    if not page:
-        return False
-
-    db.delete(page)
-    db.commit()
-    return True
+@router.delete("/pages/{id}")
+def delete(id: int, db: Session = Depends(get_db)):
+    if crud.delete_page(db, id):
+        return {"message": "Deleted"}
+    raise HTTPException(404, "Page not found")

@@ -1,40 +1,32 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models.news import News
+from app.database import get_db
+import crud.news as crud
 from schemas.news import NewsCreate, NewsUpdate
-from fastapi import APIRouter
 
 router = APIRouter()
 
-def create_news(db: Session, data: NewsCreate):
-    item = News(**data.dict())
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return item
+@router.post("/news")
+def create(news: NewsCreate, db: Session = Depends(get_db)):
+    return crud.create_news(db, news)
 
-def get_news_list(db: Session, skip=0, limit=100):
-    return db.query(News).order_by(News.id.desc()).offset(skip).limit(limit).all()
+@router.get("/news")
+def all_news(db: Session = Depends(get_db)):
+    return crud.get_news(db)
 
-def get_news(db: Session, news_id: int):
-    return db.query(News).filter(News.id == news_id).first()
+@router.get("/news/{id}")
+def get(id: int, db: Session = Depends(get_db)):
+    post = crud.get_news_by_id(db, id)
+    if not post:
+        raise HTTPException(404, "News not found")
+    return post
 
-def update_news(db: Session, news_id: int, data: NewsUpdate):
-    item = get_news(db, news_id)
-    if not item:
-        return None
+@router.put("/news/{id}")
+def update(id: int, data: NewsUpdate, db: Session = Depends(get_db)):
+    return crud.update_news(db, id, data)
 
-    for key, val in data.dict(exclude_unset=True).items():
-        setattr(item, key, val)
-
-    db.commit()
-    db.refresh(item)
-    return item
-
-def delete_news(db: Session, news_id: int):
-    item = get_news(db, news_id)
-    if not item:
-        return False
-
-    db.delete(item)
-    db.commit()
-    return True
+@router.delete("/news/{id}")
+def delete(id: int, db: Session = Depends(get_db)):
+    if crud.delete_news(db, id):
+        return {"message": "Deleted"}
+    raise HTTPException(404, "News not found")

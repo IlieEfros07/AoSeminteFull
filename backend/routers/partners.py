@@ -1,40 +1,25 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models.partner import Partner
 from schemas.partner import PartnerCreate, PartnerUpdate
-from fastapi import APIRouter
+from app.database import get_db
+import crud.partners as crud
 
 router = APIRouter()
 
-def create_partner(db: Session, data: PartnerCreate):
-    partner = Partner(**data.dict())
-    db.add(partner)
-    db.commit()
-    db.refresh(partner)
-    return partner
+@router.post("/partners")
+def create(data: PartnerCreate, db: Session = Depends(get_db)):
+    return crud.create_partner(db, data)
 
-def get_partners(db: Session):
-    return db.query(Partner).all()
+@router.get("/partners")
+def all(db: Session = Depends(get_db)):
+    return crud.get_partners(db)
 
-def get_partner(db: Session, partner_id: int):
-    return db.query(Partner).filter(Partner.id == partner_id).first()
+@router.put("/partners/{id}")
+def update(id: int, data: PartnerUpdate, db: Session = Depends(get_db)):
+    return crud.update_partner(db, id, data)
 
-def update_partner(db: Session, partner_id: int, data: PartnerUpdate):
-    partner = get_partner(db, partner_id)
-    if not partner:
-        return None
-
-    for key, val in data.dict(exclude_unset=True).items():
-        setattr(partner, key, val)
-
-    db.commit()
-    db.refresh(partner)
-    return partner
-
-def delete_partner(db: Session, partner_id: int):
-    partner = get_partner(db, partner_id)
-    if not partner:
-        return False
-
-    db.delete(partner)
-    db.commit()
-    return True
+@router.delete("/partners/{id}")
+def delete(id: int, db: Session = Depends(get_db)):
+    if crud.delete_partner(db, id):
+        return {"message": "Deleted"}
+    raise HTTPException(404, "Partner not found")

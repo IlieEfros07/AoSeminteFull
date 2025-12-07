@@ -1,91 +1,53 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models.order import Order
-from models.order_item import OrderItem
-from models.product import Product
-from schemas.order import OrderCreate, OrderUpdate
-from fastapi import APIRouter
+from app.database import get_db
+import crud.orders as crud
+
+from schemas.order import (
+    OrderCreate,
+    OrderUpdate,
+)
 
 router = APIRouter()
 
-def get_orders(db: Session, skip: int = 0, limit: int = 100):
-    return (
-        db.query(Order)
-        .order_by(Order.id.desc())
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
 
-def get_order(db: Session, order_id: int):
-    return db.query(Order).filter(Order.id == order_id).first()
-
-
-def create_order(db: Session, order_data: OrderCreate) -> Order:
-    
-
-    db_order = Order(
-        customer_name=order_data.customer_name,
-        customer_phone=order_data.customer_phone,
-        customer_email=order_data.customer_email,
-        customer_address=order_data.customer_address,
-        payment_status="pending",
-        order_status="pending",
-        user_id=order_data.user_id
-    )
-    db.add(db_order)
-    db.flush() 
-
-    total = 0
-
-    for item in order_data.items:
-        product = db.query(Product).filter(Product.id == item.product_id).first()
-
-        if not product:
-            raise Exception(f"Product {item.product_id} does not exist")
-
-        if product.stock < item.quantity:
-            raise Exception(f"Not enough stock for {product.name}")
-
-        order_item = OrderItem(
-            order_id=db_order.id,
-            product_id=item.product_id,
-            quantity=item.quantity,
-            price=product.price, 
-        )
-        db.add(order_item)
-        total += product.price * item.quantity
-
-        product.stock -= item.quantity
-
-    db_order.total = total
-
-    db.commit()
-    db.refresh(db_order)
-
-    return db_order
+@router.post("/orders")
+def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+    try:
+        new_order = crud.create_order(db, order)
+        return new_order
+    except Exception as e:
+        raise HTTPException(400, str(e))
 
 
 
-def update_order(db: Session, order_id: int, order_update: OrderUpdate):
-    order = db.query(Order).filter(Order.id == order_id).first()
+@router.get("/orders")
+def get_all_orders(db: Session = Depends(get_db)):
+    return crud.get_orders(db)
 
+
+
+@router.get("/orders/{order_id}")
+def get_order(order_id: int, db: Session = Depends(get_db)):
+    order = crud.get_order(db, order_id)
     if not order:
-        return None
-
-    data = order_update.dict(exclude_unset=True)
-    for key, value in data.items():
-        setattr(order, key, value)
-
-    db.commit()
-    db.refresh(order)
+        raise HTTPException(404, "Order not found")
     return order
 
-def delete_order(db: Session, order_id: int):
-    order = db.query(Order).filter(Order.id == order_id).first()
-    if not order:
-        return False
-    
-    db.delete(order)
-    db.commit()
-    return True
 
+
+@router.put("/orders/{order_id}")
+def update_order(order_id: int, data: OrderUpdate, db: Session = Depends(get_db)):
+    updated = crud.update_order(db, order_id, data)
+    if not updated:
+        raise HTTPException(404, "Order not found")
+    return updated
+
+
+
+@router.delete("/orders/{order_id}")
+def delete_order(order_id: int, db: Session = Depends(get_db)):
+    ok = crud.delete_order(db, order_id)
+    if not ok:
+        raise HTTPException(404, "Order not found")
+    return {"message": "Order deleted"}

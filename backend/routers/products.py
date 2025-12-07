@@ -1,35 +1,32 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models.product import Product
+from app.database import get_db
+import crud.products as crud
 from schemas.product import ProductCreate, ProductUpdate
-from fastapi import APIRouter
 
 router = APIRouter()
 
-def create_product(db: Session, product: ProductCreate) -> Product:
-    db_product = Product(**product.dict())
-    db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+@router.post("/products")
+def create(prod: ProductCreate, db: Session = Depends(get_db)):
+    return crud.create_product(db, prod)
 
-def get_products(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Product).offset(skip).limit(limit).all()
-def get_product(db: Session, product_id: int) -> Product:
-    return db.query(Product).filter(Product.id == product_id).first()
+@router.get("/products")
+def list_all(db: Session = Depends(get_db)):
+    return crud.get_products(db)
 
-def update_product(db: Session, product_id: int, product_update: ProductUpdate) -> Product:
-    db_product = db.query(Product).filter(Product.id == product_id).first()
-    if db_product:
-        for key, value in product_update.dict(exclude_unset=True).items():
-            setattr(db_product, key, value)
-        db.commit()
-        db.refresh(db_product)
-    return db_product
+@router.get("/products/{id}")
+def get(id: int, db: Session = Depends(get_db)):
+    result = crud.get_product(db, id)
+    if not result:
+        raise HTTPException(404, "Product not found")
+    return result
 
-def delete_product(db: Session, product_id: int) -> bool:
-    db_product = db.query(Product).filter(Product.id == product_id).first()
-    if db_product:
-        db.delete(db_product)
-        db.commit()
-        return True
-    return False
+@router.put("/products/{id}")
+def update(id: int, data: ProductUpdate, db: Session = Depends(get_db)):
+    return crud.update_product(db, id, data)
+
+@router.delete("/products/{id}")
+def delete(id: int, db: Session = Depends(get_db)):
+    if crud.delete_product(db, id):
+        return {"message": "Deleted"}
+    raise HTTPException(404, "Product not found")
