@@ -23,11 +23,20 @@ class ProductUpdate(BaseModel):
     category_id: Optional[int]
     is_active: Optional[bool]
 
-class ProductOut(ProductBase):
+class ProductOut(BaseModel):
     id: int
-    is_active: bool
-    category: Optional[CategoryOut] = None
-    images: List[ProductImageOut] = []
+    name: str
+    price: float
+    stock: int
+    description: str | None = None
+    category_id: int | None = None
+    is_new: bool | None = None
 
     class Config:
-        from_attributes = True
+        from_attributes = True 
+
+class ProductList(BaseModel):
+    products: List[ProductOut]
+    total: int
+    skip: int
+    limit: int

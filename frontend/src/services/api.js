@@ -1,4 +1,15 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+function unwrapList(response) {
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response.items)) return response.items;
+  if (Array.isArray(response.data)) return response.data;
+  if (Array.isArray(response.results)) return response.results;
+  if (Array.isArray(response.products)) return response.products;
+  return [];
+}
+
+
 
 async function fetchAPI(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -25,9 +36,42 @@ async function fetchAPI(endpoint, options = {}) {
   }
 }
 
+function buildQueryString(params) {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      value === 0 ||
+      value === "0"
+    ) {
+      return;
+    }
+
+    query.append(key, value);
+  });
+
+  const queryString = query.toString();
+  return queryString ? `?${queryString}` : "";
+}
+
+
 export const productsAPI = {
-  getAll: () => fetchAPI("/products"),
+  getAll: async (filters = {}) => {
+    const queryString = buildQueryString(filters);
+    const res = await fetchAPI(`/products${queryString}`);
+    return unwrapList(res);
+  },
+
   getById: (id) => fetchAPI(`/products/${id}`),
+
+  getByCategory: (categoryId) =>
+    fetchAPI(`/products?category_id=${categoryId}`),
+
+  search: (query) => fetchAPI(`/products?search=${encodeURIComponent(query)}`),
+
   create: (data) =>
     fetchAPI("/products", {
       method: "POST",
@@ -45,8 +89,12 @@ export const productsAPI = {
 };
 
 export const categoriesAPI = {
-  getAll: () => fetchAPI("/categories"),
+  getAll: async () => {
+    const res = await fetchAPI("/categories");
+    return unwrapList(res);
+  },
   getById: (id) => fetchAPI(`/categories/${id}`),
+  getWithProducts: (id) => fetchAPI(`/categories/${id}/products`),
   create: (data) =>
     fetchAPI("/categories", {
       method: "POST",
@@ -64,7 +112,7 @@ export const categoriesAPI = {
 };
 
 export const newsAPI = {
-  getAll: () => fetchAPI("/news"),
+  getAll: async () => unwrapList(await fetchAPI("/news")),
   getById: (id) => fetchAPI(`/news/${id}`),
   create: (data) =>
     fetchAPI("/news", {
@@ -83,7 +131,7 @@ export const newsAPI = {
 };
 
 export const ordersAPI = {
-  getAll: () => fetchAPI("/orders"),
+  getAll: async () => unwrapList(await fetchAPI("/orders")),
   getById: (id) => fetchAPI(`/orders/${id}`),
   create: (data) =>
     fetchAPI("/orders", {
@@ -102,7 +150,7 @@ export const ordersAPI = {
 };
 
 export const partnersAPI = {
-  getAll: () => fetchAPI("/partners"),
+  getAll: async () => unwrapList(await fetchAPI("/partners")),
   create: (data) =>
     fetchAPI("/partners", {
       method: "POST",
@@ -120,7 +168,7 @@ export const partnersAPI = {
 };
 
 export const pagesAPI = {
-  getAll: () => fetchAPI("/pages"),
+  getAll: async () => unwrapList(await fetchAPI("/pages")),
   getBySlug: (slug) => fetchAPI(`/pages/${slug}`),
   create: (data) =>
     fetchAPI("/pages", {
