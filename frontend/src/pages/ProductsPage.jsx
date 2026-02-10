@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import { Link } from "react-router-dom";
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -16,13 +17,13 @@ function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
-    const QuickActionButton = ({ title, icon, to, color }) => {
-      return (
-        <a href={to} className={color}>
-          {icon} {title}
-        </a>
-      );
-    };
+  const QuickActionButton = ({ title, icon, to, color }) => {
+    return (
+      <a href={to} className={color}>
+        {icon} {title}
+      </a>
+    );
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,14 +33,14 @@ function ProductsPage() {
           api.products.getAll(),
           api.categories.getAll(),
         ]);
-    setProducts(productsData);
-    setCategories(categoriesData);
+        setProducts(productsData);
+        setCategories(categoriesData);
 
         if (productsData.length > 0) {
           const prices = productsData.map((p) => parseFloat(p.price));
           setPriceRange({
             min: 0,
-            max: Math.ceil(Math.max(...prices) / 100) * 100, 
+            max: Math.ceil(Math.max(...prices) / 100) * 100,
           });
         }
       } catch (error) {
@@ -160,43 +161,46 @@ function ProductsPage() {
               href="/"
               className="text-2xl md:text-3xl font-extrabold tracking-tight hover:opacity-90 transition flex items-center gap-2"
             >
-              <img  src="/src/assets/logo-ao-seminteno-bk.png" alt="Logo" className="w-25 h-16" />
+              <img
+                src="/src/assets/logo-ao-seminteno-bk.png"
+                alt="Logo"
+                className="w-25 h-16"
+              />
               AO <span className="text-[#00C896]">Semințe</span>
             </a>
 
-
-            <div className="hidden lg:flex space-x-8 font-semibold">
+            <nav className="hidden lg:flex space-x-8 font-semibold">
               <QuickActionButton
                 title="Acasă"
                 icon="🏠"
                 to="/"
-                color="white hover:text-[#00C896]"
+                color="text-white hover:text-[#00C896] transition"
               />
               <QuickActionButton
                 title="Produse"
                 icon="📦"
                 to="/products"
-                color="white hover:text-[#00C896]"
+                color="text-white hover:text-[#00C896] transition"
               />
               <QuickActionButton
                 title="Noutăți"
                 icon="📰"
                 to="/news"
-                color="white hover:text-[#00C896]"
+                color="text-white hover:text-[#00C896] transition"
               />
               <QuickActionButton
                 title="Despre Noi"
                 icon="ℹ️"
                 to="/about"
-                color="white hover:text-[#00C896]"
+                color="text-white hover:text-[#00C896] transition"
               />
               <QuickActionButton
                 title="Contact"
                 icon="📞"
                 to="/contact"
-                color="white hover:text-[#00C896]"
+                color="text-white hover:text-[#00C896] transition"
               />
-            </div>
+            </nav>
 
             <div className="flex items-center gap-4">
               <button className="hover:text-[#00C896] transition relative">
@@ -304,6 +308,7 @@ function ProductsPage() {
                     ))}
                   </div>
                 </div>
+
                 <div>
                   <label className="block font-bold mb-3 text-gray-700">
                     💰 Preț
@@ -346,9 +351,13 @@ function ProductsPage() {
                     <input
                       type="range"
                       min="0"
-                      max={Math.max(
-                        ...products.map((p) => parseFloat(p.price)),
-                      )}
+                      max={
+                        products.length > 0
+                          ? Math.max(
+                              ...products.map((p) => parseFloat(p.price)),
+                            )
+                          : 10000
+                      }
                       value={priceRange.max}
                       onChange={(e) =>
                         setPriceRange({
@@ -430,97 +439,114 @@ function ProductsPage() {
                     key={product.id}
                     className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-300 group flex flex-col"
                   >
-                    <div className="relative">
-                      {product.is_new && (
-                        <div className="absolute top-4 right-4 bg-[#00C896] text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-                          Nou
-                        </div>
-                      )}
-                      {product.old_price && (
-                        <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-                          -
-                          {Math.round(
-                            (1 - product.price / product.old_price) * 100,
-                          )}
-                          %
-                        </div>
-                      )}
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="block cursor-pointer"
+                    >
+                      <div className="relative">
+                        {product.is_new && (
+                          <div className="absolute top-4 right-4 bg-[#00C896] text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                            Nou
+                          </div>
+                        )}
+                        {product.old_price && (
+                          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                            -
+                            {Math.round(
+                              (1 - product.price / product.old_price) * 100,
+                            )}
+                            %
+                          </div>
+                        )}
 
-                      <div className="h-56 bg-gradient-to-br from-[#4CAF50]/20 to-[#1B5E20]/20 overflow-hidden">
-                        <div
-                          className="h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                          style={{
-                            backgroundImage: product.image_url
-                              ? `url(${product.image_url})`
-                              : `url(https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=400&h=400&fit=crop)`,
-                          }}
-                        ></div>
+                        <div className="h-56 bg-gradient-to-br from-[#4CAF50]/20 to-[#1B5E20]/20 overflow-hidden relative">
+                          <div
+                            className="h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                            style={{
+                              backgroundImage: product.image_url
+                                ? `url(${product.image_url})`
+                                : `url(https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=400&h=400&fit=crop)`,
+                            }}
+                          />
+
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <span className="bg-white text-[#1B5E20] px-4 py-2 rounded-lg font-semibold shadow">
+                              Vezi produs
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="p-5 flex-1 flex flex-col">
-                      {/* Category */}
-                      <p className="text-sm text-[#00C896] font-semibold mb-1">
-                        {categories.find((c) => c.id === product.category_id)
-                          ?.name || "General"}
-                      </p>
-
-                      <h4 className="text-lg font-bold mb-2 line-clamp-2 flex-1">
-                        {product.name}
-                      </h4>
-
-                      {product.description && (
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {product.description}
+                      <div className="p-5 flex-1 flex flex-col">
+                        <p className="text-sm text-[#00C896] font-semibold mb-1">
+                          {categories.find((c) => c.id === product.category_id)
+                            ?.name || "General"}
                         </p>
-                      )}
-                      {product.stock !== undefined && (
-                        <div className="mb-3">
-                          {product.stock > 0 ? (
-                            <span className="text-xs text-green-600 font-semibold">
-                              ✓ În stoc ({product.stock} buc)
+
+                        <h4 className="text-lg font-bold mb-2 line-clamp-2 flex-1">
+                          {product.name}
+                        </h4>
+
+                        {product.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {product.description}
+                          </p>
+                        )}
+
+                        {product.stock !== undefined && (
+                          <div className="mb-3">
+                            {product.stock > 0 ? (
+                              <span className="text-xs text-green-600 font-semibold">
+                                ✓ În stoc ({product.stock} buc)
+                              </span>
+                            ) : (
+                              <span className="text-xs text-red-600 font-semibold">
+                                ✗ Stoc epuizat
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-1 mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-yellow-400 text-sm">
+                              ⭐
                             </span>
-                          ) : (
-                            <span className="text-xs text-red-600 font-semibold">
-                              ✗ Stoc epuizat
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1 mb-3">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-sm">
-                            ⭐
+                          ))}
+                          <span className="text-gray-500 text-xs ml-1">
+                            (5.0)
                           </span>
-                        ))}
-                        <span className="text-gray-500 text-xs ml-1">
-                          (5.0)
+                        </div>
+                      </div>
+                    </Link>
+
+                    <div className="flex justify-between items-center mt-auto p-5 pt-3 border-t">
+                      <div>
+                        <span className="text-2xl font-bold text-[#1B5E20]">
+                          {product.price} MDL
                         </span>
+                        {product.old_price && (
+                          <span className="block text-sm text-gray-400 line-through">
+                            {product.old_price} MDL
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex justify-between items-center mt-auto pt-3 border-t">
-                        <div>
-                          <span className="text-2xl font-bold text-[#1B5E20]">
-                            {product.price} MDL
-                          </span>
-                          {product.old_price && (
-                            <span className="block text-sm text-gray-400 line-through">
-                              {product.old_price} MDL
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => addToCart(product)}
-                          disabled={product.stock === 0}
-                          className={`${
-                            product.stock === 0
-                              ? "bg-gray-300 cursor-not-allowed"
-                              : "bg-[#00C896] hover:bg-[#00b584]"
-                          } text-white px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2`}
-                        >
-                          🛒 Adaugă
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addToCart(product);
+                        }}
+                        disabled={product.stock === 0}
+                        className={`${
+                          product.stock === 0
+                            ? "bg-gray-300 cursor-not-allowed"
+                            : "bg-[#00C896] hover:bg-[#00b584]"
+                        } text-white px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2`}
+                      >
+                        🛒 Adaugă
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -633,7 +659,7 @@ function ProductsPage() {
             <a href="/" className="hover:text-[#00C896]">
               Acasă
             </a>
-            <a href="/produse" className="hover:text-[#00C896]">
+            <a href="/products" className="hover:text-[#00C896]">
               Produse
             </a>
             <a href="/contact" className="hover:text-[#00C896]">

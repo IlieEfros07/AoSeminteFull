@@ -192,16 +192,45 @@ const HomePage = () => {
               href="/"
               className="text-2xl md:text-3xl font-extrabold tracking-tight hover:opacity-90 transition flex items-center gap-2"
             >
-              <img  src="/src/assets/logo-ao-seminteno-bk.png" alt="Logo" className="w-25 h-16" />
+              <img
+                src="/src/assets/logo-ao-seminteno-bk.png"
+                alt="Logo"
+                className="w-25 h-16"
+              />
               AO <span className="text-[#00C896]">Semințe</span>
             </a>
 
             <div className="hidden lg:flex space-x-8 font-semibold">
-              <QuickActionButton title="Acasă" icon="🏠" to="/" color="white hover:text-[#00C896]" />
-              <QuickActionButton title="Produse" icon="📦" to="/products" color="white hover:text-[#00C896]" />
-              <QuickActionButton title="Noutăți" icon="📰" to="/news" color="white hover:text-[#00C896]" />
-              <QuickActionButton title="Despre Noi" icon="ℹ️" to="/about" color="white hover:text-[#00C896]" />
-              <QuickActionButton title="Contact" icon="📞" to="/contact" color="white hover:text-[#00C896]" />
+              <QuickActionButton
+                title="Acasă"
+                icon="🏠"
+                to="/"
+                color="white hover:text-[#00C896]"
+              />
+              <QuickActionButton
+                title="Produse"
+                icon="📦"
+                to="/products"
+                color="white hover:text-[#00C896]"
+              />
+              <QuickActionButton
+                title="Noutăți"
+                icon="📰"
+                to="/news"
+                color="white hover:text-[#00C896]"
+              />
+              <QuickActionButton
+                title="Despre Noi"
+                icon="ℹ️"
+                to="/about"
+                color="white hover:text-[#00C896]"
+              />
+              <QuickActionButton
+                title="Contact"
+                icon="📞"
+                to="/contact"
+                color="white hover:text-[#00C896]"
+              />
             </div>
 
             <div className="flex items-center gap-4">
@@ -276,7 +305,7 @@ const HomePage = () => {
 
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                   <a
-                    href="/produse"
+                    href="/products"
                     className="bg-[#00C896] hover:bg-[#00b584] text-white font-bold py-4 px-8 rounded-full shadow-xl transition transform hover:scale-105"
                   >
                     {slide.cta} →
@@ -375,7 +404,7 @@ const HomePage = () => {
           {categories.slice(0, 6).map((cat) => (
             <a
               key={cat.id}
-              href={`/categorii/${cat.id}`}
+              href={`/products`}
               className="group block relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
@@ -435,7 +464,9 @@ const HomePage = () => {
                         ? `url(${product.image_url})`
                         : `url(https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=400&h=400&fit=crop)`,
                     }}
-                  ></div>
+                  >
+                    <a href={`/produs/${product.id}`}>View Product</a>
+                  </div>
                 </div>
 
                 <div className="p-6">
@@ -629,7 +660,7 @@ const HomePage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/produse"
+              href="/products"
               className="bg-[#00C896] hover:bg-[#00b584] text-white font-bold py-4 px-12 rounded-full shadow-xl transition transform hover:scale-105"
             >
               Explorează catalogul →
