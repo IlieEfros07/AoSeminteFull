@@ -160,11 +160,10 @@ function ProductsPage() {
               href="/"
               className="text-2xl md:text-3xl font-extrabold tracking-tight hover:opacity-90 transition flex items-center gap-2"
             >
-              <span className="bg-white text-[#1B5E20] w-10 h-10 rounded-full flex items-center justify-center text-xl">
-                🌱
-              </span>
+              <img  src="/src/assets/logo-ao-seminteno-bk.png" alt="Logo" className="w-25 h-16" />
               AO <span className="text-[#00C896]">Semințe</span>
             </a>
+
 
             <div className="hidden lg:flex space-x-8 font-semibold">
               <QuickActionButton
