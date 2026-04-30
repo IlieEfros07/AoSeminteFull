@@ -88,6 +88,8 @@ export const productsAPI = {
     }),
 };
 
+
+
 export const categoriesAPI = {
   getAll: async () => {
     const res = await fetchAPI("/categories");

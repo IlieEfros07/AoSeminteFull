@@ -33,3 +33,10 @@ def delete_product(db: Session, product_id: int) -> bool:
         db.commit()
         return True
     return False
+
+
+def get_productImg(db: Session, product_id: int) -> str:
+    db_product = db.query(Product).filter(Product.id == product_id).first()
+    if db_product:
+        return db_product.image_url
+    return None

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import CartDropdown from "../components/CartComponent";
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
+  const { addToCart, getCartTotal } = useCart();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -53,25 +55,7 @@ function ProductsPage() {
     fetchData();
   }, []);
 
-  const addToCart = (product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
 
-    alert(`${product.name} adăugat în coș!`);
-  };
-
-  const getCartTotal = () => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-  };
 
   const getFilteredProducts = () => {
     let filtered = [...products];
@@ -203,12 +187,7 @@ function ProductsPage() {
             </nav>
 
             <div className="flex items-center gap-4">
-              <button className="hover:text-[#00C896] transition relative">
-                🛒
-                <span className="absolute -top-1 -right-1 bg-[#00C896] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {getCartTotal()}
-                </span>
-              </button>
+              <CartDropdown />
             </div>
           </div>
         </div>
@@ -263,7 +242,7 @@ function ProductsPage() {
 
                 <div>
                   <label className="block font-bold mb-3 text-gray-700">
-                    📁 Categorie
+                    Categorie
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition">

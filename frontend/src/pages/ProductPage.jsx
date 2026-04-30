@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-
+import CartDropdown from "../components/CartComponent";
+import { useCart } from "../context/CartContext";
 function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,12 +12,11 @@ function ProductPage() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cart, setCart] = useState([]);
+  const { addToCart: contextAddToCart, getCartTotal } = useCart();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState("description");
-  const [showNotification, setShowNotification] = useState(false);
   const QuickActionButton = ({ title, icon, to, color }) => {
     return (
       <a href={to} className={color}>
@@ -65,25 +65,7 @@ function ProductPage() {
 
   const addToCart = () => {
     if (!product) return;
-
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item,
-        );
-      }
-      return [...prev, { ...product, quantity }];
-    });
-
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3000);
-  };
-
-  const getCartTotal = () => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
+    contextAddToCart(product, quantity);
   };
 
   const productImages = product?.images || [
@@ -212,30 +194,13 @@ function ProductPage() {
             </nav>
 
             <div className="flex items-center gap-4">
-              <button className="hover:text-[#00C896] transition relative">
-                🛒
-                <span className="absolute -top-1 -right-1 bg-[#00C896] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {getCartTotal()}
-                </span>
-              </button>
+              <CartDropdown />
             </div>
           </div>
         </div>
       </header>
 
-      {showNotification && (
-        <div className="fixed top-20 right-6 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl z-50 animate-slideIn">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">✓</span>
-            <div>
-              <p className="font-bold">Adăugat în coș!</p>
-              <p className="text-sm opacity-90">
-                {quantity} x {product.name}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       <div className="bg-gray-50 py-4">
         <div className="container mx-auto px-6">

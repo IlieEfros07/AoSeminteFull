@@ -30,7 +30,8 @@ def create_order(db: Session, order_data: OrderCreate) -> Order:
         customer_address=order_data.customer_address,
         payment_status="pending",
         order_status="pending",
-        user_id=order_data.user_id
+        user_id=order_data.user_id,
+        total=0
     )
     db.add(db_order)
     db.flush() 
@@ -38,24 +39,27 @@ def create_order(db: Session, order_data: OrderCreate) -> Order:
     total = 0
 
     for item in order_data.items:
-        product = db.query(Product).filter(Product.id == item.product_id).first()
+        product_id = item["product_id"]
+        qty = item["quantity"]
+
+        product = db.query(Product).filter(Product.id == product_id).first()
 
         if not product:
-            raise Exception(f"Product {item.product_id} does not exist")
+            raise Exception(f"Product {product_id} does not exist")
 
-        if product.stock < item.quantity:
+        if product.stock < qty:
             raise Exception(f"Not enough stock for {product.name}")
 
         order_item = OrderItem(
             order_id=db_order.id,
-            product_id=item.product_id,
-            quantity=item.quantity,
+            product_id=product_id,
+            quantity=qty,
             price=product.price, 
         )
         db.add(order_item)
-        total += product.price * item.quantity
+        total += product.price * qty
 
-        product.stock -= item.quantity
+        product.stock -= qty
 
     db_order.total = total
 

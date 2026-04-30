@@ -24,7 +24,6 @@ def list_products(
     from sqlalchemy import or_, and_
     from models.product import Product
     
-    # Start with base query
     query = db.query(Product)
 
     if category_id is not None:
@@ -74,6 +73,13 @@ def list_products(
         "skip": skip,
         "limit": limit
     }
+
+@router.get("/product/image/{id}")
+def get_productImg(id: int, db: Session = Depends(get_db)):
+    result = crud.get_product(db, id)
+    if not result:
+        raise HTTPException(404, "Product not found")
+    return result.image_url
 
 @router.get("/products/{id}")
 def get_product(id: int, db: Session = Depends(get_db)):

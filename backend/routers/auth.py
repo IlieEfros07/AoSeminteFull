@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 import crud.users as crud
+from schemas.user import UserCreate, UserOut
 
 router = APIRouter()
 
@@ -18,4 +19,8 @@ def login(data: dict, db: Session = Depends(get_db)):
     if not crud.verify_password(password, user.password_hash):
         raise HTTPException(400, "Wrong password")
 
-    return {"message": "Logged in", "user_id": user.id}
+    return {"message": "Logged in", "user_id": user.id, "role": user.role}
+
+@router.post("/register", response_model=UserOut)
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    return crud.create_user(db, user)

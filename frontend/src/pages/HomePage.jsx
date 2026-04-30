@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import { useCart } from "../context/CartContext";
+import CartDropdown from "../components/CartComponent";
 
 const HomePage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
+  const { addToCart, getCartTotal } = useCart();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -35,8 +37,8 @@ const HomePage = () => {
         ] = await Promise.all([
           api.products.getAll(),
           api.categories.getAll(),
-          // api.news.getAll(),
-          // api.partners.getAll(),
+          api.news.getAll(),
+          api.partners.getAll(),
           api.config.get(),
         ]);
 
@@ -62,23 +64,7 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const addToCart = (product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-  };
 
-  const getCartTotal = () => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-  };
 
   const heroSlides = [
     {
@@ -234,19 +220,7 @@ const HomePage = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="hidden md:block hover:text-[#00C896] transition">
-                🔍
-              </button>
-              <button className="hover:text-[#00C896] transition relative">
-                🛒
-                <span className="absolute -top-1 -right-1 bg-[#00C896] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {getCartTotal()}
-                </span>
-              </button>
-              <button className="hidden md:block hover:text-[#00C896] transition">
-                👤
-              </button>
-
+              <CartDropdown />
               <button
                 className="lg:hidden text-2xl"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -393,7 +367,7 @@ const HomePage = () => {
       <section className="py-20 container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-black mb-4">
-            Categorii <span className="text-[#00C896]">populare</span>
+            Categorii <span className="text-gray-600">populare</span>
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Descoperă gama noastră completă de produse agricole profesionale
@@ -598,7 +572,7 @@ const HomePage = () => {
           {news.map((newsItem) => (
             <a
               key={newsItem.id}
-              href={`/noutate/${newsItem.id}`}
+              href={`/news/${newsItem.id}`}
               className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all group"
             >
               <div className="relative h-64 bg-gradient-to-br from-[#4CAF50]/25 to-[#1B5E20]/25 overflow-hidden">
@@ -636,7 +610,7 @@ const HomePage = () => {
 
         <div className="text-center mt-12">
           <a
-            href="/noutati"
+            href="/news"
             className="inline-block bg-white text-[#1B5E20] border-2 border-[#1B5E20] hover:bg-[#1B5E20] hover:text-white px-10 py-4 rounded-full font-bold shadow-lg transition"
           >
             Vezi toate noutățile →

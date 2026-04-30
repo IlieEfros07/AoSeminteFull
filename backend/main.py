@@ -5,6 +5,7 @@ from routers import (
     auth,
     categories,
     products,
+    product_img,
     orders,
     config_public,
     news,
@@ -39,6 +40,7 @@ app.include_router(config_public.router, prefix="/api", tags=["Config"])
 app.include_router(news.router, prefix="/api", tags=["News"])
 app.include_router(pages.router, prefix="/api", tags=["Pages"])
 app.include_router(partners.router, prefix="/api", tags=["Partners"])
+app.include_router(product_img.router, prefix="/api", tags=["Product Image"])
 
 @app.get("/")
 def root():
